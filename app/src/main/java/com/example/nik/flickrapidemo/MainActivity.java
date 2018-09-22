@@ -103,12 +103,16 @@ public class MainActivity extends AppCompatActivity {
         backIcon.setVisibility(View.VISIBLE);
         searchEditText.setVisibility(View.VISIBLE);
         searchEditText.setText(lastSearchString);
+        searchEditText.requestFocus();
+        CommonFunctionsUtil.showKeyboard(this, searchEditText);
     }
 
     private void endSearchMode() {
         resetSearchIcon.setVisibility(View.GONE);
         backIcon.setVisibility(View.GONE);
         searchEditText.setVisibility(View.GONE);
+        searchEditText.clearFocus();
+        CommonFunctionsUtil.hideKeyboard(this);
 
         searchIcon.setVisibility(View.VISIBLE);
         titleText.setVisibility(View.VISIBLE);
