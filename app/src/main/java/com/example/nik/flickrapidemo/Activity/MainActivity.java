@@ -1,6 +1,8 @@
 package com.example.nik.flickrapidemo.Activity;
 
+import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
@@ -30,9 +32,6 @@ public class MainActivity extends AppCompatActivity {
     private ImageView backIcon;
     private TextView titleText;
     private EditText searchEditText;
-
-    // local variables
-    private String lastSearchString;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,8 +65,10 @@ public class MainActivity extends AppCompatActivity {
         resetSearchIcon.setVisibility(View.GONE);
         backIcon.setVisibility(View.GONE);
         searchEditText.setVisibility(View.GONE);
-        titleText.setText(getString(R.string.app_name));
-        lastSearchString = "";
+
+        viewModel.getTitle().observe(this, s -> titleText.setText(s));
+
+        viewModel.getLastSearchQuery().observe(this, s -> searchEditText.setText(s));
     }
 
     private void setupClickListeners() {
@@ -83,8 +84,7 @@ public class MainActivity extends AppCompatActivity {
                 handled = true;
                 String inputString = v.getText().toString();
                 if (CommonFunctionsUtil.isValidString(inputString)) {
-                    lastSearchString = inputString;
-                    endSearchMode();
+                    startSearch(inputString);
                 }
             }
             return handled;
@@ -98,7 +98,6 @@ public class MainActivity extends AppCompatActivity {
         resetSearchIcon.setVisibility(View.VISIBLE);
         backIcon.setVisibility(View.VISIBLE);
         searchEditText.setVisibility(View.VISIBLE);
-        searchEditText.setText(lastSearchString);
         searchEditText.requestFocus();
         searchEditText.setSelection(searchEditText.getText().length());
         CommonFunctionsUtil.showKeyboard(this, searchEditText);
@@ -113,6 +112,10 @@ public class MainActivity extends AppCompatActivity {
 
         searchIcon.setVisibility(View.VISIBLE);
         titleText.setVisibility(View.VISIBLE);
-        titleText.setText(lastSearchString);
+    }
+
+    private void startSearch(String searchQuery) {
+        endSearchMode();
+        viewModel.searchImages(searchQuery);
     }
 }
