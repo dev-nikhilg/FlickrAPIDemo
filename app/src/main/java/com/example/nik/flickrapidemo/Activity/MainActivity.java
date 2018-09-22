@@ -1,5 +1,6 @@
-package com.example.nik.flickrapidemo;
+package com.example.nik.flickrapidemo.Activity;
 
+import android.arch.lifecycle.ViewModelProviders;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
@@ -10,10 +11,19 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.example.nik.flickrapidemo.R;
 import com.example.nik.flickrapidemo.Utils.CommonFunctionsUtil;
 
 public class MainActivity extends AppCompatActivity {
 
+    /**
+     * viewmodel
+     */
+    private MainActivityViewModel viewModel;
+
+    /**
+     * layout items
+     */
     // Toolbar items
     private ImageView searchIcon;
     private ImageView resetSearchIcon;
@@ -28,6 +38,10 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        // init viewmodel
+        viewModel = ViewModelProviders.of(this).get(MainActivityViewModel.class);
+        viewModel.init(getApplicationContext());
 
         setupLayout();
         setupClickListeners();
@@ -57,41 +71,23 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setupClickListeners() {
-        searchIcon.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startSearchMode();
-            }
-        });
+        searchIcon.setOnClickListener(v -> startSearchMode());
 
-        resetSearchIcon.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                searchEditText.setText("");
-            }
-        });
+        resetSearchIcon.setOnClickListener(v -> searchEditText.setText(""));
 
-        backIcon.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                endSearchMode();
-            }
-        });
+        backIcon.setOnClickListener(v -> endSearchMode());
 
-        searchEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                boolean handled = false;
-                if (actionId == EditorInfo.IME_ACTION_SEARCH) {
-                    handled = true;
-                    String inputString = v.getText().toString();
-                    if (CommonFunctionsUtil.isValidString(inputString)) {
-                        lastSearchString = inputString;
-                        endSearchMode();
-                    }
+        searchEditText.setOnEditorActionListener((v, actionId, event) -> {
+            boolean handled = false;
+            if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                handled = true;
+                String inputString = v.getText().toString();
+                if (CommonFunctionsUtil.isValidString(inputString)) {
+                    lastSearchString = inputString;
+                    endSearchMode();
                 }
-                return handled;
             }
+            return handled;
         });
     }
 
