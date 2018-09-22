@@ -104,6 +104,7 @@ public class MainActivity extends AppCompatActivity {
         searchEditText.setVisibility(View.VISIBLE);
         searchEditText.setText(lastSearchString);
         searchEditText.requestFocus();
+        searchEditText.setSelection(searchEditText.getText().length());
         CommonFunctionsUtil.showKeyboard(this, searchEditText);
     }
 
