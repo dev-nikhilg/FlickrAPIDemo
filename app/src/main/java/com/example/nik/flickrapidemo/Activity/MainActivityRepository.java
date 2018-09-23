@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivityRepository {
-
     private Context applicationContext;
     private NetworkUtils networkUtils;
 
@@ -31,6 +30,8 @@ public class MainActivityRepository {
     private String query;
     private int currentPageNumber;
     private ImageResponseDto responseDto;
+
+    private boolean isLoadMoreCallOngoing = false;
 
     public void init(Context context) {
         applicationContext = context;
@@ -58,6 +59,21 @@ public class MainActivityRepository {
         return imagesLiveData;
     }
 
+    public void getMoreImages() {
+        if (isLoadMoreCallOngoing) {
+            return;
+        }
+
+        isLoadMoreCallOngoing = true;
+        currentPageNumber++;
+
+        // makeNetworkCall
+        makeNetworkCall();
+
+        // set loading status
+        imagesLiveData.setValue(NetworkResponse.loading(responseDto));
+    }
+
     private void makeNetworkCall() {
         String url = new StringBuilder(Constants.SEARCH_IMAGES_BASE_URL)
                 .append("?").append(Constants.FLICKR_API_METHOD_CONSTANT).append("=").append(Constants.FLICKR_API_METHOD_VALUE)
@@ -83,11 +99,16 @@ public class MainActivityRepository {
                         List<String> images = parseNetworkResponse(result.result);
                         responseDto.addItemsToList(images);
                         imagesLiveData.setValue(NetworkResponse.success(responseDto));
+                        if (images != null && images.size() > 0) {
+                            isLoadMoreCallOngoing = false;
+                        }
                     } catch (JSONException e) {
                         imagesLiveData.setValue(NetworkResponse.error(e.getMessage(), null));
+                        isLoadMoreCallOngoing = false;
                     }
                 } else {
                     imagesLiveData.setValue(NetworkResponse.error(result.error, null));
+                    isLoadMoreCallOngoing = false;
                 }
             }
         });
