@@ -87,7 +87,7 @@ public class NetworkTask extends AsyncTask<String, Integer, NetworkRawResult> {
             stream = connection.getInputStream();
             if (stream != null) {
                 // Converts Stream to String with max length of 10000.
-                result = readStream(stream, 10000);
+                result = readStream(stream, 15000);
             }
         } finally {
             // Close Stream and disconnect HTTPS connection.
