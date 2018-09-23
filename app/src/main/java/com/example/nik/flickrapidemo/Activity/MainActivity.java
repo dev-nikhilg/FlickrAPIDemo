@@ -6,6 +6,7 @@ import android.content.Context;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -16,12 +17,15 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.nik.flickrapidemo.R;
 import com.example.nik.flickrapidemo.Utils.CommonFunctionsUtil;
 import com.example.nik.flickrapidemo.Utils.Constants;
 import com.example.nik.flickrapidemo.data.ImageResponseDto;
 import com.example.nik.flickrapidemo.data.NetworkResponse;
+
+import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -43,6 +47,7 @@ public class MainActivity extends AppCompatActivity {
     // Recycler view items
     private RecyclerView recyclerView;
     private int RECYCLER_VIEW_NUM_COLUMNS = 3;
+    private ImagesAdapter adapter;
 
     private ProgressBar progressBar;
 
@@ -57,19 +62,11 @@ public class MainActivity extends AppCompatActivity {
 
         setupLayout();
         setupClickListeners();
-
-        viewModel.getImages().observe(this, new Observer<NetworkResponse<ImageResponseDto>>() {
-            @Override
-            public void onChanged(@Nullable NetworkResponse<ImageResponseDto> response) {
-                if (response.status == Constants.NETWORK_CALL_SUCCESS) {
-                    Log.i("NetworkResponse", "Nums items received : " + response.data.getImageList().size());
-                }
-            }
-        });
     }
 
     private void setupLayout() {
         setupToolbar();
+        setupRecyclerView();
     }
 
     private void setupToolbar() {
@@ -91,6 +88,24 @@ public class MainActivity extends AppCompatActivity {
         viewModel.getTitle().observe(this, s -> titleText.setText(s));
 
         viewModel.getLastSearchQuery().observe(this, s -> searchEditText.setText(s));
+    }
+
+    private void setupRecyclerView() {
+        progressBar = findViewById(R.id.progressBar);
+        recyclerView = findViewById(R.id.recyclerView);
+        recyclerView.setLayoutManager(new GridLayoutManager(this, RECYCLER_VIEW_NUM_COLUMNS));
+        adapter = new ImagesAdapter(new ArrayList<>());
+        recyclerView.setAdapter(adapter);
+
+        viewModel.getImages().observe(this, new Observer<NetworkResponse<ImageResponseDto>>() {
+            @Override
+            public void onChanged(@Nullable NetworkResponse<ImageResponseDto> response) {
+                if (response.status == Constants.NETWORK_CALL_SUCCESS) {
+                    Log.i("NetworkResponse", "Nums items received : " + response.data.getImageList().size());
+                    adapter.addItemsToList(response.data.getImageList());
+                }
+            }
+        });
     }
 
     private void setupClickListeners() {
