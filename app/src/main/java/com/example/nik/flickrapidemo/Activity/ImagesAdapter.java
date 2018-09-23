@@ -12,16 +12,21 @@ import com.example.nik.flickrapidemo.ImageHandler.ImageResponseCallback;
 import com.example.nik.flickrapidemo.ImageHandler.ImageUtils;
 import com.example.nik.flickrapidemo.R;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ImagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private List<String> imagesList;
     private ImageUtils imageUtils;
+    private RecyclerViewCallbackInterface callbackInterface;
 
-    public ImagesAdapter(List<String> imagesList, ImageUtils imageUtils) {
+    private int LOAD_MORE_THRESHOLD = 15;
+
+    public ImagesAdapter(List<String> imagesList, ImageUtils imageUtils, RecyclerViewCallbackInterface callbackInterface) {
         this.imagesList = imagesList;
         this.imageUtils = imageUtils;
+        this.callbackInterface = callbackInterface;
     }
 
     @NonNull
@@ -44,6 +49,9 @@ public class ImagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
                 }
             }
         });
+        if (position + LOAD_MORE_THRESHOLD > imagesList.size()) {
+            callbackInterface.loadMore();
+        }
     }
 
     @Override
@@ -52,11 +60,27 @@ public class ImagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     }
 
     public void addItemsToList(List<String> list) {
-        if (imagesList != null && list != null || list.size() > 0) {
+        if (list == null || list.size() <= 0) {
+            return;
+        }
+        if (imagesList != null) {
             int positionStart = imagesList.size();
             imagesList.addAll(list);
             notifyItemRangeInserted(positionStart, list.size());
+        } else {
+            imagesList = new ArrayList<>();
+            imagesList.addAll(list);
+            notifyDataSetChanged();
         }
+    }
+
+    public void resetList() {
+        if (imagesList != null) {
+            imagesList.clear();
+        } else {
+            imagesList = new ArrayList<>();
+        }
+        notifyDataSetChanged();
     }
 
     public class ImageViewHolder extends RecyclerView.ViewHolder {

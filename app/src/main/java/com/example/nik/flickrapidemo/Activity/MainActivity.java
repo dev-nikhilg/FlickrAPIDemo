@@ -28,7 +28,7 @@ import com.example.nik.flickrapidemo.data.NetworkResponse;
 
 import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements RecyclerViewCallbackInterface {
 
     /**
      * viewmodel
@@ -95,22 +95,35 @@ public class MainActivity extends AppCompatActivity {
         progressBar = findViewById(R.id.progressBar);
         recyclerView = findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new GridLayoutManager(this, RECYCLER_VIEW_NUM_COLUMNS));
-        adapter = new ImagesAdapter(new ArrayList<>(), ((MyApplication) getApplication()).getImageUtils());
+        adapter = new ImagesAdapter(new ArrayList<>(), ((MyApplication) getApplication()).getImageUtils(), this);
         recyclerView.setAdapter(adapter);
 
         viewModel.getImages().observe(this, new Observer<NetworkResponse<ImageResponseDto>>() {
             @Override
             public void onChanged(@Nullable NetworkResponse<ImageResponseDto> response) {
-                if (response.status == Constants.NETWORK_CALL_SUCCESS) {
-                    Log.i("NetworkResponse", "Nums items received : " + response.data.getImageList().size());
-                    adapter.addItemsToList(response.data.getImageList());
-                    progressBar.setVisibility(View.GONE);
-                    recyclerView.setVisibility(View.VISIBLE);
+                switch (response.status) {
+                    case Constants.NETWORK_CALL_INPROGRESS:
+                        if (response.data == null || response.data.getImageList().size() <= 0) {
+                            adapter.resetList();
+                            progressBar.setVisibility(View.VISIBLE);
+                            recyclerView.setVisibility(View.GONE);
+                        }
+                        return;
+                    case Constants.NETWORK_CALL_ERROR:
+                        Toast.makeText(MainActivity.this, response.message, Toast.LENGTH_SHORT).show();
+                        progressBar.setVisibility(View.GONE);
+                        recyclerView.setVisibility(View.VISIBLE);
+                        return;
+                    case Constants.NETWORK_CALL_SUCCESS:
+                        adapter.addItemsToList(response.data.getImageList());
+                        progressBar.setVisibility(View.GONE);
+                        recyclerView.setVisibility(View.VISIBLE);
+                        return;
                 }
             }
         });
 
-        progressBar.setVisibility(View.VISIBLE);
+        progressBar.setVisibility(View.GONE);
         recyclerView.setVisibility(View.GONE);
     }
 
@@ -160,5 +173,10 @@ public class MainActivity extends AppCompatActivity {
     private void startSearch(String searchQuery) {
         endSearchMode();
         viewModel.searchImages(searchQuery);
+    }
+
+    @Override
+    public void loadMore() {
+        viewModel.serachMoreImages();
     }
 }

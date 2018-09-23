@@ -62,4 +62,8 @@ public class MainActivityViewModel extends ViewModel {
         titleLiveData.setValue(query);
         searchQueryLiveData.setValue(query);
     }
+
+    public void serachMoreImages() {
+        repository.getMoreImages();
+    }
 }
