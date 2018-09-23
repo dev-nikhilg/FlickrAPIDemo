@@ -1,0 +1,31 @@
+README for FlickrAPIDemo created by Nikhil Gupta
+
+This simple app demonstrates usage of Flickr Search API available.
+
+No third party libraries have been used fir Image Handling or for making network calls.
+App uses MVVM architecture.
+For networking, we are using HttpsURLConnection to make network calls with an AsyncTask.
+We are using AsyncTask again for downloading images from their URLS.
+We are using in memory cache for caching the downloaded images.
+We are using LiveData architecture component for communication between VM and View.
+
+User enters a search query using editText field in toolbar. Then we make a GET request to the below URL
+https://api.flickr.com/services/rest/?method=flickr.photos.search&api_key=3e7cc266ae2b0e0d78e279ce8e361736&format=json&nojsoncallback=1&safe_search=1&text={user_search_query}
+
+We are using the native HttpsURLConnection available in an AsyncTask to make the network call.
+We then convert the response JSON object to list of string of urls of individual images. Format of one image's url is :
+http://farm{farm}.static.flickr.com/{server}/{id}_{secret}.jpg
+
+We then use another AsyncTask to download images for these URLs. We are using an in memory cache to cache the downloaded images.
+Finally we are using a recyclerView to present the list on the screen.
+
+We have kept a threshold number of items for making subsequent network calls for getting more pages data from the network.
+Whenever the number of items remianing in the list is less than this threshold value, we make a get more dtaa call.
+Out activity implements RecyclerViewCallback interface and in RecyclerView's adapter's onBindViewHolder(int position) function, we 
+use the callback interface object to notify the activity if it needs to initiate a loadMoreData call based on the positin of the view currently being rendered.
+
+A debug apk with name - FlickrAPIDemo-debug.apk is present in the root directory of this project to download and test the app.
+
+Few improvement the can be made to the project :
+1. Not using any scaling on downloaded Bitmaps. We can use a proper scaling to scale the bitmap to required dimension while decoding the inputStream.
+2. For a production ready code, we can use third party libraries which are much more efficient and more reliable. We can use Dagger for dependency injection, Retrofit for handling networking, Glide/Picasso for images manipulation and caching. Furthermore we can use Rx, DataBinding and other librarues as per need.
