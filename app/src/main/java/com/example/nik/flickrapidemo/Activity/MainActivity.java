@@ -19,6 +19,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.nik.flickrapidemo.MyApplication;
 import com.example.nik.flickrapidemo.R;
 import com.example.nik.flickrapidemo.Utils.CommonFunctionsUtil;
 import com.example.nik.flickrapidemo.Utils.Constants;
@@ -94,7 +95,7 @@ public class MainActivity extends AppCompatActivity {
         progressBar = findViewById(R.id.progressBar);
         recyclerView = findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new GridLayoutManager(this, RECYCLER_VIEW_NUM_COLUMNS));
-        adapter = new ImagesAdapter(new ArrayList<>());
+        adapter = new ImagesAdapter(new ArrayList<>(), ((MyApplication) getApplication()).getImageUtils());
         recyclerView.setAdapter(adapter);
 
         viewModel.getImages().observe(this, new Observer<NetworkResponse<ImageResponseDto>>() {
