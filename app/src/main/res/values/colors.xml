@@ -12,4 +12,7 @@
     <color name="toolbarTextColor">@color/white</color>
     <color name="toolbarHintColor">#99FFFFFF</color>
     <color name="toolbarTextBackgroundColor">#99FFFFFF</color>
+
+    <!-- Background color -->
+    <color name="background_color">#AAFFFFFF</color>
 </resources>

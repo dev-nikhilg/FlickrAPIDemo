@@ -6,6 +6,7 @@ import android.content.Context;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -13,6 +14,7 @@ import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.example.nik.flickrapidemo.R;
@@ -37,6 +39,12 @@ public class MainActivity extends AppCompatActivity {
     private ImageView backIcon;
     private TextView titleText;
     private EditText searchEditText;
+
+    // Recycler view items
+    private RecyclerView recyclerView;
+    private int RECYCLER_VIEW_NUM_COLUMNS = 3;
+
+    private ProgressBar progressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
