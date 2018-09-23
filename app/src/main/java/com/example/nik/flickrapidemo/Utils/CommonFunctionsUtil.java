@@ -2,6 +2,8 @@ package com.example.nik.flickrapidemo.Utils;
 
 import android.app.Activity;
 import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 
@@ -35,5 +37,19 @@ public class CommonFunctionsUtil {
                 e.printStackTrace();
             }
         }
+    }
+
+    // Utility function to check if internet is available
+    public static boolean isNetworkConnectivityAvailable(Context context) {
+        ConnectivityManager connectivityManager =
+                (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+        if (networkInfo == null || !networkInfo.isConnected() ||
+                (networkInfo.getType() != ConnectivityManager.TYPE_WIFI
+                        && networkInfo.getType() != ConnectivityManager.TYPE_MOBILE)) {
+            // If no connectivity, return false
+            return false;
+        }
+        return true;
     }
 }

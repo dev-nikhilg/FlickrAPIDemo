@@ -2,10 +2,12 @@ package com.example.nik.flickrapidemo.Activity;
 
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.Context;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
@@ -15,6 +17,9 @@ import android.widget.TextView;
 
 import com.example.nik.flickrapidemo.R;
 import com.example.nik.flickrapidemo.Utils.CommonFunctionsUtil;
+import com.example.nik.flickrapidemo.Utils.Constants;
+import com.example.nik.flickrapidemo.data.ImageResponseDto;
+import com.example.nik.flickrapidemo.data.NetworkResponse;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -44,6 +49,15 @@ public class MainActivity extends AppCompatActivity {
 
         setupLayout();
         setupClickListeners();
+
+        viewModel.getImages().observe(this, new Observer<NetworkResponse<ImageResponseDto>>() {
+            @Override
+            public void onChanged(@Nullable NetworkResponse<ImageResponseDto> response) {
+                if (response.status == Constants.NETWORK_CALL_SUCCESS) {
+                    Log.i("NetworkResponse", "Nums items received : " + response.data.getImageList().size());
+                }
+            }
+        });
     }
 
     private void setupLayout() {
