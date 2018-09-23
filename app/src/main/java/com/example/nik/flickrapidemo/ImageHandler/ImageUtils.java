@@ -1,9 +1,10 @@
 package com.example.nik.flickrapidemo.ImageHandler;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
+import android.support.v4.util.LruCache;
 import android.view.View;
-import android.widget.ImageView;
 
 import com.example.nik.flickrapidemo.Utils.CommonFunctionsUtil;
 
@@ -18,8 +19,30 @@ public class ImageUtils implements DownloadCallback {
     private Map<View, ImageViewToURLAndCallbackMappingObject> viewToURLAndCallbackMap;
     private Map<String, View> urlToViewMap;
 
+    private LruCache<String, Bitmap> mMemoryCache;
+
     private ImageUtils(Context context) {
         this.context = context;
+        initCache();
+    }
+
+    private void initCache() {
+        // Get max available VM memory, exceeding this amount will throw an
+        // OutOfMemory exception. Stored in kilobytes as LruCache takes an
+        // int in its constructor.
+        final int maxMemory = (int) (Runtime.getRuntime().maxMemory() / 1024);
+
+        // Use 1/4th of the available memory for this memory cache.
+        final int cacheSize = maxMemory / 4;
+
+        mMemoryCache = new LruCache<String, Bitmap>(cacheSize) {
+            @Override
+            protected int sizeOf(String key, Bitmap bitmap) {
+                // The cache size will be measured in kilobytes rather than
+                // number of items.
+                return bitmap.getByteCount() / 1024;
+            }
+        };
     }
 
     public static ImageUtils getInstance(Context context) {
@@ -32,6 +55,10 @@ public class ImageUtils implements DownloadCallback {
     }
 
     public void getImage(String url, View view, ImageResponseCallback callback) {
+        if (mMemoryCache.get(url) != null) {
+            callback.onBitmapReceived(mMemoryCache.get(url));
+            return;
+        }
         if (CommonFunctionsUtil.isNetworkConnectivityAvailable(context)) {
             networkTask = new DownloadImageTask(this);
             networkTask.execute(url);
@@ -60,6 +87,7 @@ public class ImageUtils implements DownloadCallback {
                 viewToURLAndCallbackMap.remove(view);
             }
         }
+        mMemoryCache.put(downloadURL, result.result);
         urlToViewMap.remove(downloadURL);
     }
 

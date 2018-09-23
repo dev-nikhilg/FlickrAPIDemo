@@ -30,8 +30,6 @@ public class DownloadImageTask extends AsyncTask<String, Void, DownloadImageResu
             } catch (Exception e) {
                 result = DownloadImageResult.downloadFailure(e.getMessage(), url);
             }
-
-
         }
         return result;
     }
