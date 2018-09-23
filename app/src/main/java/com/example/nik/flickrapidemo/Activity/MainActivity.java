@@ -104,9 +104,14 @@ public class MainActivity extends AppCompatActivity {
                 if (response.status == Constants.NETWORK_CALL_SUCCESS) {
                     Log.i("NetworkResponse", "Nums items received : " + response.data.getImageList().size());
                     adapter.addItemsToList(response.data.getImageList());
+                    progressBar.setVisibility(View.GONE);
+                    recyclerView.setVisibility(View.VISIBLE);
                 }
             }
         });
+
+        progressBar.setVisibility(View.VISIBLE);
+        recyclerView.setVisibility(View.GONE);
     }
 
     private void setupClickListeners() {

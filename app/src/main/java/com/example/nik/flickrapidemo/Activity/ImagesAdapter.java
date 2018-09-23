@@ -1,5 +1,6 @@
 package com.example.nik.flickrapidemo.Activity;
 
+import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -7,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
+import com.example.nik.flickrapidemo.ImageHandler.ImageResponseCallback;
 import com.example.nik.flickrapidemo.ImageHandler.ImageUtils;
 import com.example.nik.flickrapidemo.R;
 
@@ -32,7 +34,16 @@ public class ImagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         ImageViewHolder vh = (ImageViewHolder) holder;
-        imageUtils.getImage(imagesList.get(position), vh.imageView);
+        vh.imageView.setImageBitmap(null);
+        String url = imagesList.get(position);
+        imageUtils.getImage(url, vh.imageView, new ImageResponseCallback() {
+            @Override
+            public void onBitmapReceived(Bitmap bitmap) {
+                if (bitmap != null) {
+                    vh.imageView.setImageBitmap(bitmap);
+                }
+            }
+        });
     }
 
     @Override
